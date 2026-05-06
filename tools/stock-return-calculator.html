@@ -1,88 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stock Return Calculator | AXORIUM</title>
-<link rel="stylesheet" href="../css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Return Calculator | AXORIUM</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
 
-<nav class="navbar">
-<div class="logo">AXORIUM</div>
-<ul class="nav-links">
-<li><a href="../index.html">Home</a></li>
-<li><a href="../tools.html">Tools</a></li>
-</ul>
-</nav>
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
 
-<section class="tools-section">
-<h1>Stock Return Calculator</h1>
+    <section class="tools-section">
+        <h1>Stock Return Calculator</h1>
 
-<div class="tool-card">
+        <div class="tool-card">
+            <p>Calculate profit, loss, and percentage return on stock investments.</p>
+            
+            <input type="number" id="buyPrice" class="tool-input" placeholder="Buy Price per Share">
+            <input type="number" id="sellPrice" class="tool-input" placeholder="Sell Price per Share">
+            <input type="number" id="shares" class="tool-input" placeholder="Number of Shares">
+            
+            <button onclick="calculateStockReturn()">Calculate</button>
+            
+            <div id="result"></div>
+        </div>
 
-<p>Calculate profit, loss, and percentage return on stock investments.</p>
+        <div class="tool-explanation">
+            <h2>What is a Stock Return Calculator?</h2>
+            <p>A Stock Return Calculator helps investors calculate profit or loss from buying and selling shares.</p>
 
-<input type="number" id="buyPrice" class="tool-input" placeholder="Buy Price per Share">
-<input type="number" id="sellPrice" class="tool-input" placeholder="Sell Price per Share">
-<input type="number" id="shares" class="tool-input" placeholder="Number of Shares">
+            <h2>How Stock Return Works</h2>
+            <p>The calculator compares the purchase price with the selling price and multiplies the difference by the number of shares.</p>
 
-<button onclick="calculateStockReturn()">Calculate</button>
+            <h2>Example</h2>
+            <p>If you buy 100 shares at ₹200 and sell them at ₹250, your total profit would be ₹5,000.</p>
 
-<div id="result"></div>
+            <h2>Why This Tool is Useful</h2>
+            <p>This tool helps investors analyze trading performance and investment returns.</p>
+        </div>
 
-</div>
+    </section>
 
-</section>
+    <footer>© 2026 AXORIUM</footer>
 
-<footer>© 2026 AXORIUM</footer>
+    <script>
+        function calculateStockReturn(){
+            let buy=parseFloat(document.getElementById("buyPrice").value)
+            let sell=parseFloat(document.getElementById("sellPrice").value)
+            let shares=parseFloat(document.getElementById("shares").value)
 
-<script>
+            if(isNaN(buy)||isNaN(sell)||isNaN(shares)||shares<=0){
+                document.getElementById("result").innerHTML="Please enter valid values."
+                return
+            }
 
-function calculateStockReturn(){
+            let investment=buy*shares
+            let value=sell*shares
+            let profit=value-investment
+            let returnPercent=(profit/investment)*100
 
-let buy=parseFloat(document.getElementById("buyPrice").value)
-let sell=parseFloat(document.getElementById("sellPrice").value)
-let shares=parseFloat(document.getElementById("shares").value)
+            let status="Profit"
+            if(profit<0){status="Loss"}
 
-if(isNaN(buy)||isNaN(sell)||isNaN(shares)||shares<=0){
-document.getElementById("result").innerHTML="Please enter valid values."
-return
-}
-
-let investment=buy*shares
-let value=sell*shares
-let profit=value-investment
-let returnPercent=(profit/investment)*100
-
-let status="Profit"
-if(profit<0){status="Loss"}
-
-document.getElementById("result").innerHTML=
-"Total Investment: "+investment.toFixed(2)+
-"<br>"+status+": "+profit.toFixed(2)+
-"<br><strong>Return: "+returnPercent.toFixed(2)+"%</strong>"
-
-}
-
-</script>
+            document.getElementById("result").innerHTML=
+            "Total Investment: ₹ "+investment.toFixed(2)+
+            "<br>"+status+": ₹ "+profit.toFixed(2)+
+            "<br><strong>Return: "+returnPercent.toFixed(2)+"%</strong>"
+        }
+    </script>
 
 </body>
 </html>
-
-<div class="tool-explanation">
-
-<h2>What is a Stock Return Calculator?</h2>
-<p>A Stock Return Calculator helps investors calculate profit or loss from buying and selling shares.</p>
-
-<h2>How Stock Return Works</h2>
-<p>The calculator compares the purchase price with the selling price and multiplies the difference by the number of shares.</p>
-
-<h2>Example</h2>
-<p>If you buy 100 shares at ₹200 and sell them at ₹250, your total profit would be ₹5,000.</p>
-
-<h2>Why This Tool is Useful</h2>
-<p>This tool helps investors analyze trading performance and investment returns.</p>
-
-  </div>
