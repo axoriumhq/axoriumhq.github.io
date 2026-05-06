@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Score & Negative Marking Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate your final exam score with negative marking and check your accuracy instantly.">
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/exam-score-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.1);
+            border-left: 4px solid var(--primary-gold);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none;
+            text-align: left;
+        }
+        .result-box h3 { color: var(--primary-gold); margin-top: 0; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Exam Score Calculator</h1>
+        <p>Instantly calculate your final score factoring in negative marking.</p>
+
+        <div class="tool-card" style="max-width: 700px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Marks per Correct Answer (+)</label>
+                    <input type="number" id="marksCorrect" class="tool-input" placeholder="e.g., 4" value="4">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Negative Marks per Wrong (-)</label>
+                    <input type="number" id="marksWrong" class="tool-input" placeholder="e.g., 1" value="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Total Correct Answers</label>
+                    <input type="number" id="numCorrect" class="tool-input" placeholder="Enter number">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Total Incorrect Answers</label>
+                    <input type="number" id="numWrong" class="tool-input" placeholder="Enter number">
+                </div>
+            </div>
+
+            <button onclick="calculateExamScore()" style="width: 100%;">Calculate Final Score</button>
+
+            <div id="examResult" class="result-box">
+                <h3>Your Performance</h3>
+                <div class="stat-row"><span>Total Attempted:</span> <span id="resAttempted">0</span></div>
+                <div class="stat-row"><span>Positive Marks:</span> <span id="resPositive" style="color: #4ade80;">0</span></div>
+                <div class="stat-row"><span>Negative Marks:</span> <span id="resNegative" style="color: #f87171;">0</span></div>
+                <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 15px 0;">
+                <div class="stat-row" style="font-size: 1.3rem;"><span>Final Score:</span> <span id="resFinal" style="color: var(--primary-gold);">0</span></div>
+                <div class="stat-row"><span>Accuracy Rate:</span> <span id="resAccuracy">0%</span></div>
+            </div>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateExamScore() {
+            let mCorrect = parseFloat(document.getElementById("marksCorrect").value);
+            let mWrong = parseFloat(document.getElementById("marksWrong").value);
+            let nCorrect = parseInt(document.getElementById("numCorrect").value) || 0;
+            let nWrong = parseInt(document.getElementById("numWrong").value) || 0;
+
+            if(isNaN(mCorrect) || isNaN(mWrong)) {
+                alert("Please enter the marking scheme rules.");
+                return;
+            }
+
+            let attempted = nCorrect + nWrong;
+            if(attempted === 0) {
+                alert("Please enter your correct and incorrect attempts.");
+                return;
+            }
+
+            let positiveScore = nCorrect * mCorrect;
+            let negativeScore = nWrong * mWrong;
+            let finalScore = positiveScore - negativeScore;
+            let accuracy = (nCorrect / attempted) * 100;
+
+            document.getElementById("resAttempted").innerText = attempted;
+            document.getElementById("resPositive").innerText = "+" + positiveScore;
+            document.getElementById("resNegative").innerText = "-" + negativeScore;
+            document.getElementById("resFinal").innerText = finalScore;
+            document.getElementById("resAccuracy").innerText = accuracy.toFixed(1) + "%";
+
+            document.getElementById("examResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
