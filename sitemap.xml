@@ -331,5 +331,12 @@
   <changefreq>monthly</changefreq>
   <priority>0.9</priority>
 </url>
+
+  <url>
+  <loc>https://axoriumhq.github.io/tools/fire-retirement-calculator.html</loc>
+  <lastmod>2026-05-06</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.9</priority>
+</url>
   
 </urlset>
