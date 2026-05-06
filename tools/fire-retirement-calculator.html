@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIRE Retirement Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate exactly when you can retire early and achieve Financial Independence based on the 4% rule.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/fire-retirement-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>FIRE Retirement Calculator</h1>
+        <p>Find out your exact "Financial Independence, Retire Early" age.</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Current Age</label>
+                    <input type="number" id="currentAge" class="tool-input" placeholder="e.g., 25" min="15" max="80">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Current Savings / Net Worth</label>
+                    <input type="number" id="currentSavings" class="tool-input" placeholder="e.g., 50000" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Monthly Savings & Investments</label>
+                    <input type="number" id="monthlySavings" class="tool-input" placeholder="e.g., 1500" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Monthly Expenses (in Retirement)</label>
+                    <input type="number" id="monthlyExpenses" class="tool-input" placeholder="e.g., 3000" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Est. Annual Return (%)</label>
+                    <input type="number" id="annualReturn" class="tool-input" placeholder="e.g., 8" value="8" min="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Safe Withdrawal Rate (%)</label>
+                    <input type="number" id="swr" class="tool-input" placeholder="e.g., 4" value="4" min="1" max="10">
+                </div>
+            </div>
+
+            <button onclick="calculateFIRE()" style="width: 100%; margin-top: 10px;">Calculate FIRE Target</button>
+
+            <div id="fireResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Your Freedom Blueprint</h3>
+                
+                <div class="stat-row"><span>Target FIRE Net Worth:</span> <span class="stat-value" id="resTarget">0</span></div>
+                <div class="stat-row"><span>Years to Retirement:</span> <span class="stat-value" id="resYears">0</span></div>
+                
+                <div class="stat-row highlight-row">
+                    <span>You can retire at age:</span> 
+                    <span class="stat-value" style="color: var(--primary-gold);" id="resAge">0</span>
+                </div>
+                
+                <p id="fireMessage" style="margin-top: 15px; font-size: 0.95rem; color: var(--text-muted); text-align: center; border-top: 1px solid var(--border-light); padding-top: 15px;"></p>
+            </div>
+        </div>
+
+        <!-- EXPLANATION SECTION FOR SEO -->
+        <div class="tool-explanation">
+            <h2>What is FIRE?</h2>
+            <p>FIRE stands for <strong>Financial Independence, Retire Early</strong>. It is a movement dedicated to aggressive savings and smart investing so you can generate enough passive income to cover your living expenses forever, allowing you to quit your job decades before the traditional retirement age.</p>
+
+            <h2>How the 4% Rule Works</h2>
+            <p>The foundation of FIRE is the "4% Rule," which stems from the famous Trinity Study. It states that if you invest in a diversified portfolio, you can safely withdraw 4% of your total net worth every year without ever running out of money. Therefore, your "FIRE Target" is simply your annual expenses divided by 4% (or multiplied by 25).</p>
+
+            <h2>Example Calculation</h2>
+            <p>If you plan to spend $40,000 a year in retirement, you need a portfolio of $1,000,000 ($40,000 x 25). Once your investments reach $1 Million, the compound interest generated each year will theoretically pay for your $40,000 lifestyle indefinitely.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateFIRE() {
+            let age = parseInt(document.getElementById("currentAge").value);
+            let savings = parseFloat(document.getElementById("currentSavings").value) || 0;
+            let monthlySavings = parseFloat(document.getElementById("monthlySavings").value);
+            let monthlyExpenses = parseFloat(document.getElementById("monthlyExpenses").value);
+            let returnRate = parseFloat(document.getElementById("annualReturn").value);
+            let swr = parseFloat(document.getElementById("swr").value);
+
+            if(isNaN(age) || isNaN(monthlySavings) || isNaN(monthlyExpenses) || isNaN(returnRate) || isNaN(swr)) {
+                alert("Please fill in all required fields to calculate your FIRE age.");
+                return;
+            }
+
+            // Calculate FIRE Target (Annual Expenses / SWR)
+            let annualExpenses = monthlyExpenses * 12;
+            let fireTarget = annualExpenses / (swr / 100);
+
+            // Simulation Variables
+            let monthlyReturnRate = (returnRate / 100) / 12;
+            let months = 0;
+            let currentBalance = savings;
+
+            if (currentBalance >= fireTarget) {
+                // Already reached FIRE
+                document.getElementById("resTarget").innerText = formatCurrency(fireTarget);
+                document.getElementById("resYears").innerText = "0 Years";
+                document.getElementById("resAge").innerText = age + " (You're already there!)";
+                document.getElementById("fireMessage").innerText = "Congratulations! You have already achieved Financial Independence.";
+                document.getElementById("fireResult").style.display = "block";
+                return;
+            }
+
+            if (monthlySavings <= 0 && returnRate <= 0) {
+                alert("You must either save money or have a positive return rate to reach your goal.");
+                return;
+            }
+
+            // Loop to calculate time to reach target
+            while (currentBalance < fireTarget && months < 1200) { // Capped at 100 years
+                currentBalance += (currentBalance * monthlyReturnRate);
+                currentBalance += monthlySavings;
+                months++;
+            }
+
+            let yearsToFIRE = (months / 12).toFixed(1);
+            let retirementAge = (age + (months / 12)).toFixed(1);
+
+            const formatCurrency = (num) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(num);
+
+            document.getElementById("resTarget").innerText = formatCurrency(Math.round(fireTarget));
+            document.getElementById("resYears").innerText = yearsToFIRE + " Years";
+            document.getElementById("resAge").innerText = retirementAge;
+            
+            document.getElementById("fireMessage").innerText = `By investing continuously, compound interest will do the heavy lifting to reach your goal of ${formatCurrency(Math.round(fireTarget))}. Keep grinding.`;
+
+            document.getElementById("fireResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
