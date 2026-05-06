@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step-Up SIP Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate your mutual fund returns with an annual step-up increase. Plan your wealth creation professionally.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/step-up-sip-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Step-Up SIP Calculator</h1>
+        <p>Accelerate your wealth by increasing your SIP amount annually.</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Monthly Investment</label>
+                    <input type="number" id="monthlySIP" class="tool-input" placeholder="e.g., 5000" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Annual Step-Up (%)</label>
+                    <input type="number" id="stepUpPercent" class="tool-input" placeholder="e.g., 10" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Expected Return (%)</label>
+                    <input type="number" id="returnRate" class="tool-input" placeholder="e.g., 12" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Time Period (Years)</label>
+                    <input type="number" id="years" class="tool-input" placeholder="e.g., 10" min="1">
+                </div>
+            </div>
+
+            <button onclick="calculateStepUpSIP()" style="width: 100%; margin-top: 10px;">Calculate Wealth</button>
+
+            <div id="sipResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Investment Projection</h3>
+                
+                <div class="stat-row"><span>Total Amount Invested:</span> <span class="stat-value" id="resInvested">0</span></div>
+                <div class="stat-row"><span>Est. Wealth Gained:</span> <span class="stat-value" id="resGained">0</span></div>
+                
+                <div class="stat-row highlight-row">
+                    <span>Total Maturity Value:</span> 
+                    <span class="stat-value" style="color: var(--primary-gold);" id="resMaturity">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPLANATION SECTION FOR SEO -->
+        <div class="tool-explanation">
+            <h2>What is a Step-Up SIP?</h2>
+            <p>A Step-Up Systematic Investment Plan (SIP) allows investors to increase their monthly investment amount by a fixed percentage every year. As your income grows, your investments should grow with it to beat inflation and achieve financial freedom faster.</p>
+
+            <h2>Why is it Better Than a Standard SIP?</h2>
+            <p>In a normal SIP, your investment amount remains flat for the entire duration. With a Step-Up SIP, even a conservative 10% annual increase in your investment can drastically multiply your final maturity value due to the power of compounding.</p>
+
+            <h2>Example of the Step-Up Magic</h2>
+            <p>If you invest 5,000 per month at a 12% return for 20 years, a standard SIP will yield around 50 Lakhs. However, if you apply a 10% annual Step-Up to that exact same SIP, your final value surges to nearly 1 Crore. Small, incremental increases make a massive difference over time.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateStepUpSIP() {
+            let monthly = parseFloat(document.getElementById("monthlySIP").value);
+            let stepUp = parseFloat(document.getElementById("stepUpPercent").value);
+            let rate = parseFloat(document.getElementById("returnRate").value);
+            let years = parseInt(document.getElementById("years").value);
+
+            if(isNaN(monthly) || isNaN(stepUp) || isNaN(rate) || isNaN(years)) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
+
+            let totalInvested = 0;
+            let maturityValue = 0;
+            let monthlyRate = rate / 12 / 100;
+            let currentMonthlySIP = monthly;
+
+            for (let i = 1; i <= years; i++) {
+                for (let j = 1; j <= 12; j++) {
+                    totalInvested += currentMonthlySIP;
+                    maturityValue = (maturityValue + currentMonthlySIP) * (1 + monthlyRate);
+                }
+                // Increase the SIP amount for the next year
+                currentMonthlySIP = currentMonthlySIP + (currentMonthlySIP * (stepUp / 100));
+            }
+
+            let wealthGained = maturityValue - totalInvested;
+
+            // Formatter for clean currency look
+            const formatCurrency = (num) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
+
+            document.getElementById("resInvested").innerText = formatCurrency(Math.round(totalInvested));
+            document.getElementById("resGained").innerText = formatCurrency(Math.round(wealthGained));
+            document.getElementById("resMaturity").innerText = formatCurrency(Math.round(maturityValue));
+
+            document.getElementById("sipResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
