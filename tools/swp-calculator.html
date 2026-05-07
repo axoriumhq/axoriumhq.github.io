@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWP Calculator | Systematic Withdrawal Plan | AXORIUM</title>
+    <meta name="description" content="Calculate your Systematic Withdrawal Plan (SWP) to see how long your retirement corpus will last with regular monthly withdrawals.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/swp-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+        }
+        .warning-text {
+            color: #f87171;
+            font-weight: 600;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>SWP Calculator</h1>
+        <p>Plan your retirement withdrawals and ensure your money outlives you.</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Total Investment (Corpus)</label>
+                    <input type="number" id="corpus" class="tool-input" placeholder="e.g., 1000000" min="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Monthly Withdrawal Amount</label>
+                    <input type="number" id="withdrawal" class="tool-input" placeholder="e.g., 5000" min="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Expected Return Rate (%)</label>
+                    <input type="number" id="rate" class="tool-input" placeholder="e.g., 8" min="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Time Period (Years)</label>
+                    <input type="number" id="years" class="tool-input" placeholder="e.g., 10" min="1">
+                </div>
+            </div>
+
+            <button onclick="calculateSWP()" style="width: 100%;">Calculate Withdrawal Plan</button>
+
+            <div id="swpResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Retirement Projection</h3>
+                
+                <div class="stat-row"><span>Total Invested Amount:</span> <span class="stat-value" id="resInvested">0</span></div>
+                <div class="stat-row"><span>Total Amount Withdrawn:</span> <span class="stat-value" style="color: #4ade80;" id="resWithdrawn">0</span></div>
+                
+                <div class="stat-row highlight-row">
+                    <span>Final Balance Remaining:</span> 
+                    <span class="stat-value" style="color: var(--primary-gold);" id="resBalance">0</span>
+                </div>
+
+                <p id="warningMessage" class="warning-text" style="display: none;">Warning: Your money will run out before this time period ends!</p>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is an SWP?</h2>
+            <p>A <strong>Systematic Withdrawal Plan (SWP)</strong> is the exact opposite of a SIP. Instead of putting money into a mutual fund every month, you invest a large lump sum upfront and instruct the fund to pay you a fixed amount of money every single month. It is heavily used by retirees to generate a steady "salary" from their life savings.</p>
+
+            <h2>How Does the Math Work?</h2>
+            <p>While you are withdrawing money every month, the remaining balance in your account is still invested in the market and earning interest. If your investments grow at a faster rate than you are withdrawing, your total balance will actually increase over time, even though you are taking cash out every month.</p>
+
+            <h2>Why Use an SWP Calculator?</h2>
+            <p>The biggest fear in retirement is running out of money. This tool allows you to stress-test your finances. By adjusting your expected return rate and monthly withdrawal amount, you can find the exact "safe" withdrawal limit that ensures your money lasts for your entire lifetime.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateSWP() {
+            let corpus = parseFloat(document.getElementById("corpus").value);
+            let withdrawal = parseFloat(document.getElementById("withdrawal").value);
+            let rate = parseFloat(document.getElementById("rate").value);
+            let years = parseInt(document.getElementById("years").value);
+
+            if(isNaN(corpus) || isNaN(withdrawal) || isNaN(rate) || isNaN(years)) {
+                alert("Please fill in all numerical fields.");
+                return;
+            }
+
+            let monthlyRate = rate / 12 / 100;
+            let totalMonths = years * 12;
+            let balance = corpus;
+            let totalWithdrawn = 0;
+            let ranOut = false;
+
+            for (let i = 1; i <= totalMonths; i++) {
+                // Add interest for the month
+                balance += (balance * monthlyRate);
+                
+                // Subtract the withdrawal
+                balance -= withdrawal;
+                
+                if (balance <= 0) {
+                    ranOut = true;
+                    totalWithdrawn += (balance + withdrawal); // Add whatever was left for the final withdrawal
+                    balance = 0;
+                    break;
+                } else {
+                    totalWithdrawn += withdrawal;
+                }
+            }
+
+            // Formatting
+            const formatMoney = (num) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
+
+            document.getElementById("resInvested").innerText = formatMoney(Math.round(corpus));
+            document.getElementById("resWithdrawn").innerText = formatMoney(Math.round(totalWithdrawn));
+            document.getElementById("resBalance").innerText = formatMoney(Math.round(balance));
+
+            if (ranOut) {
+                document.getElementById("warningMessage").style.display = "block";
+                document.getElementById("resBalance").style.color = "#f87171"; // Turn balance red
+            } else {
+                document.getElementById("warningMessage").style.display = "none";
+                document.getElementById("resBalance").style.color = "var(--primary-gold)";
+            }
+
+            document.getElementById("swpResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
