@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dividend Income & DRIP Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate your passive dividend income and see the compound growth of reinvesting your dividends (DRIP).">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/dividend-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.3rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+        .toggle-container label {
+            margin-left: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-gold);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Dividend Income Calculator</h1>
+        <p>Calculate your passive income and compound wealth through dividend reinvestment.</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Total Investment Amount</label>
+                    <input type="number" id="principal" class="tool-input" placeholder="e.g., 10000" min="0">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Annual Dividend Yield (%)</label>
+                    <input type="number" id="yield" class="tool-input" placeholder="e.g., 4.5" min="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Expected Annual Stock Growth (%)</label>
+                    <input type="number" id="growth" class="tool-input" placeholder="e.g., 5" min="0" step="any" value="5">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Years to Hold</label>
+                    <input type="number" id="years" class="tool-input" placeholder="e.g., 10" min="1">
+                </div>
+            </div>
+
+            <div class="toggle-container">
+                <input type="checkbox" id="dripToggle" checked>
+                <label for="dripToggle">Enable DRIP (Automatically reinvest dividends to buy more stock)</label>
+            </div>
+
+            <button onclick="calculateDividend()" style="width: 100%;">Calculate Passive Income</button>
+
+            <div id="divResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Portfolio Projection</h3>
+                
+                <div class="stat-row"><span>Original Investment:</span> <span class="stat-value" id="resPrincipal">0</span></div>
+                <div class="stat-row"><span>Total Dividends Earned:</span> <span class="stat-value" id="resDividends">0</span></div>
+                
+                <div class="stat-row highlight-row" style="border-top: none; margin-top: 0; padding-top: 5px;">
+                    <span>Final Portfolio Value:</span> 
+                    <span class="stat-value" style="color: var(--primary-gold);" id="resTotalValue">0</span>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 20px 0;">
+
+                <h4 style="margin: 0 0 10px 0; color: var(--text-muted);">Future Passive Income (In Final Year)</h4>
+                <div class="stat-row"><span>Annual Dividend Income:</span> <span class="stat-value" style="color: #4ade80;" id="resAnnualInc">0</span></div>
+                <div class="stat-row"><span>Monthly Dividend Income:</span> <span class="stat-value" style="color: #4ade80;" id="resMonthlyInc">0</span></div>
+            </div>
+        </div>
+
+        <!-- EXPLANATION SECTION FOR SEO -->
+        <div class="tool-explanation">
+            <h2>What is Dividend Income?</h2>
+            <p>When you buy stock in certain established companies, they pay you a portion of their profits simply for owning their shares. This payout is called a dividend. It is one of the most reliable forms of passive income for long-term investors.</p>
+
+            <h2>What is DRIP?</h2>
+            <p>DRIP stands for <strong>Dividend Reinvestment Plan</strong>. Instead of taking your dividend payments as cash, a DRIP automatically uses that cash to buy more shares of the same stock. Because you now own more shares, your next dividend payment will be even larger. Over years, this creates a massive compounding snowball effect on your wealth.</p>
+
+            <h2>How This Calculator Helps</h2>
+            <p>This tool allows you to forecast your exact passive income potential. By inputting your initial investment and expected yield, you can see exactly how much cash your portfolio will generate per month and per year, and visually understand the difference between keeping the cash versus reinvesting it.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateDividend() {
+            let principal = parseFloat(document.getElementById("principal").value);
+            let yieldPct = parseFloat(document.getElementById("yield").value);
+            let growthPct = parseFloat(document.getElementById("growth").value);
+            let years = parseInt(document.getElementById("years").value);
+            let isDripEnabled = document.getElementById("dripToggle").checked;
+
+            if(isNaN(principal) || isNaN(yieldPct) || isNaN(growthPct) || isNaN(years)) {
+                alert("Please fill in all numerical fields.");
+                return;
+            }
+
+            let currentPrincipal = principal;
+            let totalDividends = 0;
+            let currentAnnualDividend = 0;
+
+            for (let i = 1; i <= years; i++) {
+                // Stock price grows first
+                currentPrincipal += currentPrincipal * (growthPct / 100);
+                
+                // Dividend is paid based on the new value
+                currentAnnualDividend = currentPrincipal * (yieldPct / 100);
+                totalDividends += currentAnnualDividend;
+
+                // If DRIP is enabled, buy more stock with the dividend
+                if (isDripEnabled) {
+                    currentPrincipal += currentAnnualDividend;
+                }
+            }
+
+            // Formatting
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num).replace('$', '');
+
+            document.getElementById("resPrincipal").innerText = formatMoney(principal);
+            document.getElementById("resDividends").innerText = formatMoney(totalDividends);
+            document.getElementById("resTotalValue").innerText = formatMoney(currentPrincipal);
+            
+            document.getElementById("resAnnualInc").innerText = formatMoney(currentAnnualDividend) + " / yr";
+            document.getElementById("resMonthlyInc").innerText = formatMoney(currentAnnualDividend / 12) + " / mo";
+
+            document.getElementById("divResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
