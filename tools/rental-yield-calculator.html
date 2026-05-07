@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Rental Yield Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate your Gross Rental Yield, Net ROI, and annual cash flow for real estate investment properties.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/rental-yield-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Rental Yield Calculator</h1>
+        <p>Analyze real estate profitability, cash flow, and Return on Investment (ROI).</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Property Purchase Price</label>
+                    <input type="number" id="propertyPrice" class="tool-input" placeholder="e.g., 250000" min="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Expected Monthly Rent</label>
+                    <input type="number" id="monthlyRent" class="tool-input" placeholder="e.g., 2000" min="0">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Annual Expenses (Taxes, Insurance, Maintenance, HOA)</label>
+                    <input type="number" id="annualExpenses" class="tool-input" placeholder="e.g., 4500" min="0" value="0">
+                </div>
+            </div>
+
+            <button onclick="calculateYield()" style="width: 100%;">Calculate Property ROI</button>
+
+            <div id="yieldResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Investment Analysis</h3>
+                
+                <div class="stat-row"><span>Total Annual Rent:</span> <span class="stat-value" id="resAnnualRent">0</span></div>
+                <div class="stat-row"><span>Net Annual Cash Flow:</span> <span class="stat-value" style="color: #4ade80;" id="resCashFlow">0</span></div>
+                
+                <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 20px 0;">
+
+                <div class="stat-row"><span>Gross Rental Yield:</span> <span class="stat-value" id="resGrossYield">0%</span></div>
+                
+                <div class="highlight-row">
+                    <span style="display:block; font-size: 1rem; color: var(--text-muted); margin-bottom: 5px;">Net Rental Yield (True ROI)</span>
+                    <strong id="resNetYield">0%</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is Rental Yield?</h2>
+            <p><strong>Rental Yield</strong> is the financial metric real estate investors use to measure the profitability of an income-generating property. It represents the percentage of return you get on the property's purchase price through rental income.</p>
+
+            <h2>Gross Yield vs. Net Yield</h2>
+            <p><strong>Gross Yield</strong> is simply your total annual rent divided by the property price. While useful for a quick glance, it is misleading because it ignores costs.</p>
+            <p><strong>Net Yield</strong> is your true Return on Investment (ROI). It subtracts all your annual operating expenses (like property management fees, maintenance, insurance, and taxes) from your rental income before dividing by the purchase price. This tells you exactly how hard your money is actually working for you.</p>
+
+            <h2>What is a "Good" Rental Yield?</h2>
+            <p>While it varies heavily by location and interest rates, a Net Rental Yield between <strong>5% and 8%</strong> is generally considered a strong investment in residential real estate. Anything lower means the cash flow might not be enough to cover unexpected emergency repairs.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateYield() {
+            let price = parseFloat(document.getElementById("propertyPrice").value);
+            let rent = parseFloat(document.getElementById("monthlyRent").value);
+            let expenses = parseFloat(document.getElementById("annualExpenses").value) || 0;
+
+            if(isNaN(price) || isNaN(rent)) {
+                alert("Please enter the property price and monthly rent.");
+                return;
+            }
+
+            if(price <= 0) {
+                alert("Property price must be greater than zero.");
+                return;
+            }
+
+            let annualRent = rent * 12;
+            let netCashFlow = annualRent - expenses;
+
+            let grossYield = (annualRent / price) * 100;
+            let netYield = (netCashFlow / price) * 100;
+
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+
+            document.getElementById("resAnnualRent").innerText = formatMoney(annualRent);
+            
+            let cashFlowEl = document.getElementById("resCashFlow");
+            cashFlowEl.innerText = formatMoney(netCashFlow);
+            cashFlowEl.style.color = netCashFlow >= 0 ? "#4ade80" : "#f87171";
+
+            document.getElementById("resGrossYield").innerText = grossYield.toFixed(2) + "%";
+            
+            let netYieldEl = document.getElementById("resNetYield");
+            netYieldEl.innerText = netYield.toFixed(2) + "%";
+            netYieldEl.style.color = netYield >= 0 ? "var(--primary-gold)" : "#f87171";
+
+            document.getElementById("yieldResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
