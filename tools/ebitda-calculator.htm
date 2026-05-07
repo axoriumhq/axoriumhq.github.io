@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBITDA & Business Valuation Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate your company's EBITDA, margin, and total Enterprise Value to see how much your business is worth.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/ebitda-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .section-label {
+            grid-column: 1 / -1;
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 5px;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>EBITDA & Valuation Calculator</h1>
+        <p>Calculate your company's core profitability and estimated acquisition value.</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div class="section-label">Core Financials</div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Total Revenue ($)</label>
+                    <input type="number" id="revenue" class="tool-input" placeholder="e.g., 1000000" min="1" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Net Income (Bottom Line Profit)</label>
+                    <input type="number" id="netIncome" class="tool-input" placeholder="e.g., 150000" step="any">
+                </div>
+                
+                <div class="section-label">The "ITDA" Add-Backs</div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Interest Expense</label>
+                    <input type="number" id="interest" class="tool-input" placeholder="e.g., 20000" value="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Taxes Paid</label>
+                    <input type="number" id="taxes" class="tool-input" placeholder="e.g., 45000" value="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Depreciation</label>
+                    <input type="number" id="depreciation" class="tool-input" placeholder="e.g., 10000" value="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Amortization</label>
+                    <input type="number" id="amortization" class="tool-input" placeholder="e.g., 5000" value="0" step="any">
+                </div>
+
+                <div class="section-label">Valuation Metrics</div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Industry Valuation Multiple (e.g., 4x, 6x, 10x)</label>
+                    <input type="number" id="multiple" class="tool-input" placeholder="e.g., 5" value="5" min="1" step="any">
+                </div>
+            </div>
+
+            <button onclick="calculateEBITDA()" style="width: 100%;">Calculate EBITDA & Value</button>
+
+            <div id="ebitdaResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Financial Health Check</h3>
+                
+                <div class="stat-row"><span>Adjusted EBITDA:</span> <span class="stat-value" style="color: #4ade80;" id="resEbitda">0</span></div>
+                <div class="stat-row"><span>EBITDA Margin:</span> <span class="stat-value" id="resMargin">0%</span></div>
+                
+                <div class="highlight-row">
+                    <span style="display:block; font-size: 1rem; color: var(--text-muted); margin-bottom: 5px;">Estimated Enterprise Value (Business Worth)</span>
+                    <strong id="resValuation">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is EBITDA?</h2>
+            <p><strong>EBITDA</strong> stands for Earnings Before Interest, Taxes, Depreciation, and Amortization. It is widely considered one of the most important metrics in corporate finance. It measures a company's raw, operational profitability by stripping away accounting decisions, tax environments, and debt financing.</p>
+
+            <h2>Why Do Investors Add Those Things Back?</h2>
+            <p>If you are buying a business, you don't care how the previous owner financed their debt (Interest) or how their specific accountant handled asset write-offs (Depreciation). You want to know exactly how much hard cash the core business operations generate. Adding those non-operational expenses back to the Net Income gives buyers a clear picture of the company's true cash-generating power.</p>
+
+            <h2>Understanding Enterprise Value & Multiples</h2>
+            <p>When private equity firms or competitors buy a company, they rarely just look at Revenue. They buy the company for a <strong>Multiple of EBITDA</strong>. For example, a standard brick-and-mortar business might sell for 3x or 4x its EBITDA. A high-growth software company (SaaS) might sell for 10x or 15x its EBITDA. You can use this calculator to estimate exactly what your business would sell for today.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateEBITDA() {
+            let revenue = parseFloat(document.getElementById("revenue").value);
+            let netIncome = parseFloat(document.getElementById("netIncome").value);
+            let interest = parseFloat(document.getElementById("interest").value) || 0;
+            let taxes = parseFloat(document.getElementById("taxes").value) || 0;
+            let depreciation = parseFloat(document.getElementById("depreciation").value) || 0;
+            let amortization = parseFloat(document.getElementById("amortization").value) || 0;
+            let multiple = parseFloat(document.getElementById("multiple").value) || 1;
+
+            if(isNaN(revenue) || isNaN(netIncome)) {
+                alert("Please enter at least your Total Revenue and Net Income.");
+                return;
+            }
+
+            // EBITDA Formula: Net Income + Interest + Taxes + Depreciation + Amortization
+            let ebitda = netIncome + interest + taxes + depreciation + amortization;
+            
+            // EBITDA Margin
+            let margin = (ebitda / revenue) * 100;
+            
+            // Enterprise Valuation
+            let valuation = ebitda * multiple;
+
+            // Formatting
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+
+            document.getElementById("resEbitda").innerText = formatMoney(ebitda);
+            document.getElementById("resMargin").innerText = margin.toFixed(2) + "%";
+            document.getElementById("resValuation").innerText = formatMoney(valuation);
+
+            document.getElementById("ebitdaResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
