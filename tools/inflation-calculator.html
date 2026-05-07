@@ -1,104 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Inflation Calculator | AXORIUM</title>
-
-<link rel="stylesheet" href="../css/style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inflation Calculator | Purchasing Power | AXORIUM</title>
+    <meta name="description" content="Calculate how inflation affects your money's purchasing power over time. See what your money is worth in the future or past.">
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/inflation-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
+        .result-box { background: rgba(198, 167, 94, 0.05); border: 1px solid var(--primary-gold); padding: 25px; margin-top: 25px; border-radius: 12px; display: none; text-align: left; }
+        .highlight-row { font-size: 1.8rem; color: var(--primary-gold); margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-light); text-align: center; }
+    </style>
 </head>
-
 <body>
+    <nav class="navbar"><div class="logo">AXORIUM</div><ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../tools.html">Tools</a></li></ul></nav>
 
-<nav class="navbar">
-<div class="logo">AXORIUM</div>
+    <section class="tools-section">
+        <h1>Inflation Calculator</h1>
+        <p>Calculate how the value of your money changes over time due to inflation.</p>
 
-<ul class="nav-links">
-<li><a href="../index.html">Home</a></li>
-<li><a href="../tools.html">Tools</a></li>
-</ul>
-</nav>
+        <div class="tool-card" style="max-width: 700px; margin: 0 auto;">
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Amount of Money</label>
+                    <input type="number" id="amount" class="tool-input" placeholder="e.g., 1000" min="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Average Inflation Rate (%)</label>
+                    <input type="number" id="inflationRate" class="tool-input" placeholder="e.g., 6" value="6">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Number of Years</label>
+                    <input type="number" id="years" class="tool-input" placeholder="e.g., 10" min="1">
+                </div>
+            </div>
 
-<section class="tools-section">
+            <button onclick="calculateInflation()" style="width: 100%;">Calculate Purchasing Power</button>
 
-<h1>Inflation Calculator</h1>
+            <div id="resultBox" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0;">Inflation Impact</h3>
+                <p id="descriptionText" style="color: var(--text-secondary);"></p>
+                <div class="highlight-row">
+                    <span style="display:block; font-size: 1rem; color: var(--text-muted); margin-bottom: 5px;">Future Value (Purchasing Power)</span>
+                    <strong id="resFutureValue">0</strong>
+                </div>
+            </div>
+        </div>
 
-<div class="tool-card">
+        <div class="tool-explanation">
+            <h2>What is Inflation?</h2>
+            <p>Inflation is the rate at which the general level of prices for goods and services rises, and subsequently, purchasing power falls. When inflation occurs, every dollar you own buys a smaller percentage of a good or service.</p>
+            <h2>How it Affects You</h2>
+            <p>If the inflation rate is 6%, something that costs $100 today will cost $106 next year. Over 10 or 20 years, this effect compounds, making your "saved" cash worth significantly less if it isn't invested to grow faster than the inflation rate.</p>
+        </div>
+    </section>
 
-<p>Calculate how inflation affects the value of money over time.</p>
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
 
-<input type="number" id="amount" placeholder="Starting Amount" class="tool-input">
+    <script>
+        function calculateInflation() {
+            let amount = parseFloat(document.getElementById("amount").value);
+            let rate = parseFloat(document.getElementById("inflationRate").value);
+            let years = parseFloat(document.getElementById("years").value);
 
-<input type="number" id="rate" placeholder="Annual Inflation Rate (%)" class="tool-input">
+            if(isNaN(amount) || isNaN(rate) || isNaN(years)) { alert("Please fill in all fields."); return; }
 
-<input type="number" id="years" placeholder="Number of Years" class="tool-input">
-
-<button onclick="calculateInflation()">Calculate</button>
-
-<div id="result"></div>
-
-</div>
-
-</section>
-
-<footer>
-© 2026 AXORIUM
-</footer>
-
-<script>
-
-function calculateInflation(){
-
-let amount = parseFloat(document.getElementById("amount").value);
-let rate = parseFloat(document.getElementById("rate").value)/100;
-let years = parseFloat(document.getElementById("years").value);
-
-let futureValue = amount * Math.pow(1 + rate, years);
-
-let inflationLoss = futureValue - amount;
-
-document.getElementById("result").innerHTML =
-"<h3>Future Value: $" + futureValue.toFixed(2) + "</h3>" +
-"<p>Increase due to inflation: $" + inflationLoss.toFixed(2) + "</p>";
-
-}
-
-</script>
-
+            // Formula: Future Value = P / (1 + r)^n
+            let futureValue = amount / Math.pow((1 + (rate / 100)), years);
+            
+            document.getElementById("descriptionText").innerText = `In ${years} years, your money will have the same buying power that ${futureValue.toFixed(2)} has today.`;
+            document.getElementById("resFutureValue").innerText = futureValue.toFixed(2);
+            document.getElementById("resultBox").style.display = "block";
+        }
+    </script>
 </body>
-  </html>
-<section class="tool-explanation">
-
-<h2>What is an Inflation Calculator?</h2>
-<p>
-An Inflation Calculator helps estimate how the value of money changes over time 
-due to inflation. It shows how much a certain amount of money from the past would 
-be worth today or how much money you may need in the future to maintain the same 
-purchasing power.
-</p>
-
-<h2>How This Tool Works</h2>
-<p>
-The calculator uses an inflation rate and a time period to determine the change 
-in purchasing power. By entering an initial amount, the starting year, and the 
-ending year, the tool calculates the adjusted value based on the rate of inflation.
-</p>
-
-<h2>Example</h2>
-<p>
-For example, if someone had ₹10,000 in the year 2010 and the average annual 
-inflation rate was 6%, the inflation calculator would estimate how much money 
-would be required today to buy the same goods and services.
-</p>
-
-<h2>Why Use an Inflation Calculator?</h2>
-<p>
-An inflation calculator helps people understand the long-term effects of rising 
-prices on their savings and investments. It is useful for financial planning, 
-retirement planning, and understanding how the value of money changes over time.
-</p>
-
-</section>
+</html>
