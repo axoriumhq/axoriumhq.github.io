@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAGR Calculator | Compound Annual Growth Rate | AXORIUM</title>
+    <meta name="description" content="Calculate your investment's Compound Annual Growth Rate (CAGR) to measure its true year-over-year performance.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/cagr-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>CAGR Calculator</h1>
+        <p>Calculate the true year-over-year growth rate of your investments.</p>
+
+        <div class="tool-card" style="max-width: 700px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Initial Investment Value</label>
+                    <input type="number" id="initialValue" class="tool-input" placeholder="e.g., 10000" min="1">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Final Investment Value</label>
+                    <input type="number" id="finalValue" class="tool-input" placeholder="e.g., 25000" min="1">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Duration (Years)</label>
+                    <input type="number" id="years" class="tool-input" placeholder="e.g., 5" min="0.1" step="any">
+                </div>
+            </div>
+
+            <button onclick="calculateCAGR()" style="width: 100%;">Calculate True Growth Rate</button>
+
+            <div id="cagrResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Performance Summary</h3>
+                
+                <div class="stat-row"><span>Total Absolute Return:</span> <span class="stat-value" id="resAbsolute">0%</span></div>
+                <div class="stat-row"><span>Total Profit/Loss:</span> <span class="stat-value" id="resProfit">0</span></div>
+                
+                <div class="highlight-row">
+                    <span style="display:block; font-size: 1rem; color: var(--text-muted); margin-bottom: 5px;">Compound Annual Growth Rate (CAGR)</span>
+                    <strong id="resCAGR">0%</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is CAGR?</h2>
+            <p><strong>Compound Annual Growth Rate (CAGR)</strong> is the most accurate way to measure the performance of an investment over time. It represents the smooth, annualized rate at which an investment grows, assuming profits are reinvested at the end of each year.</p>
+
+            <h2>Why Absolute Return is Misleading</h2>
+            <p>If you buy a stock for $100 and sell it for $200 five years later, your "Absolute Return" is 100%. While that sounds great, it doesn't factor in time. A 100% return in 1 year is incredible; a 100% return over 20 years is terrible. CAGR fixes this by telling you exactly what your return was <em>per year</em>.</p>
+
+            <h2>How the CAGR Formula Works</h2>
+            <p>The mathematical formula for CAGR is: <code>((Final Value / Initial Value) ^ (1 / Number of Years)) - 1</code>. This formula eliminates the volatility of the market and gives you one single percentage that you can use to compare different investments (like real estate vs. stocks vs. mutual funds).</p>
+
+            <h2>A Good CAGR Benchmark</h2>
+            <p>Historically, the S&P 500 stock market index averages a CAGR of around 8% to 10% per year (adjusted for inflation). Most investors use this benchmark to determine if their individual stock picks or mutual funds are actually performing well.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateCAGR() {
+            let initial = parseFloat(document.getElementById("initialValue").value);
+            let final = parseFloat(document.getElementById("finalValue").value);
+            let years = parseFloat(document.getElementById("years").value);
+
+            if(isNaN(initial) || isNaN(final) || isNaN(years)) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            if(initial <= 0 || years <= 0) {
+                alert("Initial value and years must be greater than zero.");
+                return;
+            }
+
+            // CAGR Formula: (Final/Initial)^(1/Years) - 1
+            let cagr = (Math.pow((final / initial), (1 / years)) - 1) * 100;
+            
+            // Absolute Return Formula
+            let absoluteReturn = ((final - initial) / initial) * 100;
+            let profit = final - initial;
+
+            // Formatting
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(num);
+
+            document.getElementById("resAbsolute").innerText = absoluteReturn.toFixed(2) + "%";
+            
+            // Handle profit vs loss colors
+            let profitElement = document.getElementById("resProfit");
+            profitElement.innerText = (profit >= 0 ? "+" : "") + formatMoney(profit);
+            profitElement.style.color = profit >= 0 ? "#4ade80" : "#f87171"; // Green if positive, Red if negative
+
+            document.getElementById("resCAGR").innerText = cagr.toFixed(2) + "%";
+
+            document.getElementById("cagrResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
