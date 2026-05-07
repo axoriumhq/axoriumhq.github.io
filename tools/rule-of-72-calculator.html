@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule of 72 Calculator | AXORIUM</title>
+    <meta name="description" content="Use the Rule of 72 to instantly calculate how many years it will take to double your investment money.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/rule-of-72-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+        }
+        .highlight-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-gold);
+            margin: 10px 0;
+            line-height: 1;
+        }
+        .context-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        .comparison-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .comparison-table th {
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Rule of 72 Calculator</h1>
+        <p>Discover exactly how long it takes to double your money.</p>
+
+        <div class="tool-card" style="max-width: 600px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Expected Annual Interest Rate (%)</label>
+                    <input type="number" id="interestRate" class="tool-input" placeholder="e.g., 8" min="0.1" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Initial Investment Amount (Optional)</label>
+                    <input type="number" id="initialAmount" class="tool-input" placeholder="e.g., 10000" min="0">
+                </div>
+            </div>
+
+            <button onclick="calculateRuleOf72()" style="width: 100%;">Calculate Time to Double</button>
+
+            <div id="rule72Result" class="result-box">
+                <h3 style="margin-top: 0; color: var(--text-primary);">Your Money Will Double In:</h3>
+                
+                <div class="highlight-number" id="resYears">0</div>
+                <div style="font-weight: 600; color: var(--primary-gold); font-size: 1.2rem;">Years</div>
+                
+                <div id="amountContext" class="context-text" style="display: none;">
+                    Your <strong id="resInitial"></strong> will grow to <strong style="color: #4ade80;" id="resDoubled"></strong>.
+                </div>
+
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border-light); font-size: 0.9rem; color: var(--text-muted);">
+                    *The Rule of 72 provides a highly accurate estimate, but actual compounding mathematics may vary slightly by a fraction of a year.
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is the Rule of 72?</h2>
+            <p>The <strong>Rule of 72</strong> is a famous mathematical shortcut used in finance to quickly estimate the number of years required to double your invested money at a given annual rate of return.</p>
+
+            <h2>The Simple Formula</h2>
+            <p>You simply divide the number 72 by your expected annual interest rate. <br>
+            <strong>Example:</strong> If you expect an 8% return from the stock market, you calculate <code>72 / 8 = 9</code>. It will take approximately 9 years for your portfolio to double in size.</p>
+
+            <h2>Why It Is So Powerful</h2>
+            <p>Understanding this rule completely changes how you view long-term investing. It visually demonstrates the power of compound interest. If you invest $50,000 at age 30 and earn a 10% return (doubling every 7.2 years), that money will double nearly five times before you retire at 65, turning into over $1.5 Million—without you adding another dime.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateRuleOf72() {
+            let rate = parseFloat(document.getElementById("interestRate").value);
+            let amount = parseFloat(document.getElementById("initialAmount").value);
+
+            if(isNaN(rate) || rate <= 0) {
+                alert("Please enter a valid, positive interest rate.");
+                return;
+            }
+
+            // Rule of 72 calculation
+            let yearsToDouble = 72 / rate;
+
+            document.getElementById("resYears").innerText = yearsToDouble.toFixed(1);
+
+            // Handle optional amount logic
+            let contextDiv = document.getElementById("amountContext");
+            if (!isNaN(amount) && amount > 0) {
+                const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+                
+                document.getElementById("resInitial").innerText = formatMoney(amount);
+                document.getElementById("resDoubled").innerText = formatMoney(amount * 2);
+                contextDiv.style.display = "block";
+            } else {
+                contextDiv.style.display = "none";
+            }
+
+            document.getElementById("rule72Result").style.display = "block";
+        }
+    </script>
+</body>
+</html>
