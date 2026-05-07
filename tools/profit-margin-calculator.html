@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit Margin & Markup Calculator | AXORIUM</title>
+    <meta name="description" content="Calculate your business gross profit margin, markup percentage, and total profit instantly.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/profit-margin-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Profit Margin Calculator</h1>
+        <p>Calculate your gross profit, margin, and markup instantly.</p>
+
+        <div class="tool-card" style="max-width: 700px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Cost of Good (COGS)</label>
+                    <input type="number" id="cost" class="tool-input" placeholder="e.g., 50" min="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Selling Price (Revenue)</label>
+                    <input type="number" id="revenue" class="tool-input" placeholder="e.g., 120" min="0" step="any">
+                </div>
+            </div>
+
+            <button onclick="calculateMargin()" style="width: 100%;">Calculate Profitability</button>
+
+            <div id="marginResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Business Metrics</h3>
+                
+                <div class="stat-row"><span>Gross Profit:</span> <span class="stat-value" style="color: #4ade80;" id="resProfit">0</span></div>
+                <div class="stat-row"><span>Markup Percentage:</span> <span class="stat-value" id="resMarkup">0%</span></div>
+                
+                <div class="highlight-row">
+                    <span style="display:block; font-size: 1rem; color: var(--text-muted); margin-bottom: 5px;">Gross Profit Margin</span>
+                    <strong id="resMargin">0%</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is Profit Margin?</h2>
+            <p><strong>Profit Margin</strong> tells you how much of every dollar of sales a company keeps in its earnings. For example, a 20% profit margin means the business has a net income of $0.20 for each dollar of total revenue earned.</p>
+
+            <h2>Margin vs. Markup: What is the difference?</h2>
+            <p>This is the most common mistake new business owners make. <strong>Margin</strong> is based on the <em>selling price</em> (Revenue), while <strong>Markup</strong> is based on the <em>cost</em> (COGS).</p>
+            <p>If you buy a product for $50 and sell it for $100, your profit is $50. Your <strong>Markup is 100%</strong> (because the profit is 100% of your cost). However, your <strong>Margin is 50%</strong> (because the profit is exactly half of your total selling price).</p>
+
+            <h2>Why E-commerce Sellers Need This</h2>
+            <p>Whether you are running a Shopify dropshipping store, selling on Amazon FBA, or freelancing, knowing your exact gross margin ensures you leave enough room to pay for advertising, software, and taxes without going into debt.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateMargin() {
+            let cost = parseFloat(document.getElementById("cost").value);
+            let revenue = parseFloat(document.getElementById("revenue").value);
+
+            if(isNaN(cost) || isNaN(revenue)) {
+                alert("Please enter both Cost and Selling Price.");
+                return;
+            }
+
+            if(revenue <= 0) {
+                alert("Selling price must be greater than zero.");
+                return;
+            }
+
+            let profit = revenue - cost;
+            let margin = (profit / revenue) * 100;
+            
+            // Handle Markup calculation (Avoid division by zero if cost is 0)
+            let markup = 0;
+            if (cost > 0) {
+                markup = (profit / cost) * 100;
+            } else {
+                markup = "Infinite"; // If it cost nothing, markup is technically infinite
+            }
+
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(num);
+
+            document.getElementById("resProfit").innerText = (profit >= 0 ? "+" : "") + formatMoney(profit);
+            document.getElementById("resMargin").innerText = margin.toFixed(2) + "%";
+            
+            if (markup === "Infinite") {
+                document.getElementById("resMarkup").innerText = "∞";
+            } else {
+                document.getElementById("resMarkup").innerText = markup.toFixed(2) + "%";
+            }
+
+            // Color coding based on profitability
+            document.getElementById("resProfit").style.color = profit >= 0 ? "#4ade80" : "#f87171";
+            document.getElementById("resMargin").style.color = margin >= 0 ? "var(--primary-gold)" : "#f87171";
+
+            document.getElementById("marginResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
