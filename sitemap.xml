@@ -380,5 +380,12 @@
   <changefreq>monthly</changefreq>
   <priority>0.9</priority>
 </url>
+
+  <url>
+  <loc>https://axoriumhq.github.io/tools/rule-of-72-calculator.html</loc>
+  <lastmod>2026-05-07</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.8</priority>
+</url>
   
 </urlset>
