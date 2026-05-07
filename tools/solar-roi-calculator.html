@@ -50,6 +50,10 @@
                     <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Expected Utility Price Increase (%, Yearly)</label>
                     <input type="number" id="inflation" class="tool-input" placeholder="e.g., 3" value="3" min="0" step="any">
                 </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">System Lifespan / Analysis Timeframe (Years)</label>
+                    <input type="number" id="lifespan" class="tool-input" placeholder="e.g., 25" value="25" min="1">
+                </div>
             </div>
 
             <button onclick="calculateSolar()" style="width: 100%;">Calculate ROI & Payback</button>
@@ -65,7 +69,7 @@
                 </div>
                 
                 <div class="stat-row" style="margin-top: 15px; font-size: 1.1rem; border-top: 1px solid var(--border-light); padding-top: 15px;">
-                    <span>Total 20-Year Profit (Savings minus Cost):</span> <span class="stat-value" style="color: #4ade80;" id="resProfit">0</span>
+                    <span id="dynamicProfitLabel">Total Profit (Savings minus Cost):</span> <span class="stat-value" style="color: #4ade80;" id="resProfit">0</span>
                 </div>
             </div>
         </div>
@@ -79,11 +83,18 @@
             let rebates = parseFloat(document.getElementById("rebates").value) || 0;
             let monthlyBill = parseFloat(document.getElementById("monthlyBill").value);
             let inflationPct = parseFloat(document.getElementById("inflation").value) || 0;
+            let lifespan = parseInt(document.getElementById("lifespan").value) || 25;
 
-            if(isNaN(cost) || isNaN(monthlyBill)) { alert("Please enter the system cost and your monthly bill."); return; }
+            if(isNaN(cost) || isNaN(monthlyBill)) { 
+                alert("Please enter the system cost and your monthly bill."); 
+                return; 
+            }
 
             let netCost = cost - rebates;
-            if(netCost <= 0) { alert("Rebates cannot be higher than the system cost."); return; }
+            if(netCost <= 0) { 
+                alert("Rebates cannot be higher than the system cost."); 
+                return; 
+            }
 
             let annualSavings = monthlyBill * 12;
             let totalSavings = 0;
@@ -91,26 +102,32 @@
             let brokeEven = false;
             let currentYearSavings = annualSavings;
 
-            for(let year = 1; year <= 25; year++) {
+            for(let year = 1; year <= lifespan; year++) {
                 totalSavings += currentYearSavings;
+                
                 if(!brokeEven && totalSavings >= netCost) {
                     paybackYear = year;
                     brokeEven = true;
                 }
+                
+                // Increase the savings for the next year based on utility inflation
                 currentYearSavings += currentYearSavings * (inflationPct / 100);
             }
 
-            let twentyYearProfit = totalSavings - netCost;
+            let totalProfit = totalSavings - netCost;
 
             const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
 
             document.getElementById("resNetCost").innerText = formatMoney(netCost);
             document.getElementById("resYearOne").innerText = formatMoney(annualSavings);
-            document.getElementById("resPayback").innerText = brokeEven ? paybackYear + " Years" : "Over 25 Years";
-            document.getElementById("resProfit").innerText = formatMoney(twentyYearProfit);
             
-            document.getElementById("solarResult").style.display = "block";
-        }
-    </script>
-</body>
-</html>
+            if (brokeEven) {
+                document.getElementById("resPayback").innerText = paybackYear + " Years";
+            } else {
+                document.getElementById("resPayback").innerText = "Over " + lifespan + " Years";
+                document.getElementById("resPayback").style.color = "#f87171"; // Turn red if it doesn't break even
+            }
+
+            document.getElementById("dynamicProfitLabel").innerText = `Total ${lifespan}-Year Profit (Savings minus Cost):`;
+            
+            let profitEl = document.getElementById
