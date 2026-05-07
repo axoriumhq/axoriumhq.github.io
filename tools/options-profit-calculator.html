@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options Profit Calculator | Call & Put Payoff | AXORIUM</title>
+    <meta name="description" content="Calculate your exact profit, loss, and break-even points for Call and Put options trading.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/options-profit-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 600px) {
+            .calc-grid { grid-template-columns: 1fr; }
+        }
+        .result-box {
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+        }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .highlight-row {
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-light);
+            text-align: center;
+        }
+        select.tool-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: #1a1a1a;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        select.tool-input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Options Profit Calculator</h1>
+        <p>Calculate your exact payout, risk, and break-even price at expiration.</p>
+
+        <div class="tool-card" style="max-width: 750px; margin: 0 auto;">
+            
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Option Type</label>
+                    <select id="optionType" class="tool-input">
+                        <option value="call">Call Option (Long)</option>
+                        <option value="put">Put Option (Long)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Strike Price</label>
+                    <input type="number" id="strike" class="tool-input" placeholder="e.g., 150" min="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Premium Paid (Per Share)</label>
+                    <input type="number" id="premium" class="tool-input" placeholder="e.g., 2.50" min="0" step="any">
+                </div>
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Number of Contracts</label>
+                    <input type="number" id="contracts" class="tool-input" placeholder="e.g., 1 (100 shares)" min="1" value="1">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Asset Price at Expiration</label>
+                    <input type="number" id="expiryPrice" class="tool-input" placeholder="e.g., 160" min="0" step="any">
+                </div>
+            </div>
+
+            <button onclick="calculateOption()" style="width: 100%;">Calculate Profit / Loss</button>
+
+            <div id="optionResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Trade Analysis</h3>
+                
+                <div class="stat-row"><span>Total Capital Risked:</span> <span class="stat-value" id="resRisk">0</span></div>
+                <div class="stat-row"><span>Break-Even Price:</span> <span class="stat-value" id="resBreakEven">0</span></div>
+                
+                <div class="highlight-row">
+                    <span style="display:block; font-size: 1rem; color: var(--text-muted); margin-bottom: 5px;">Total Net Profit / Loss</span>
+                    <strong id="resProfit">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>How Options Trading Works</h2>
+            <p>Options contracts give you the right, but not the obligation, to buy or sell a stock at a specific price (the <strong>Strike Price</strong>) on or before a certain date. Because one standard options contract controls 100 shares of the underlying stock, options allow traders to leverage small amounts of capital for massive potential gains.</p>
+
+            <h2>Call Options vs. Put Options</h2>
+            <p><strong>Call Options:</strong> You buy a Call when you believe the stock price will go UP. Your profit is theoretically infinite if the stock skyrockets, but your maximum loss is strictly limited to the premium you paid.</p>
+            <p><strong>Put Options:</strong> You buy a Put when you believe the stock price will go DOWN. You make money as the stock price crashes below your strike price.</p>
+
+            <h2>Understanding the Break-Even Point</h2>
+            <p>Your break-even point is the stock price at which your trade makes exactly $0. For a Call option, the stock must rise past your strike price <em>plus</em> the premium you paid. For a Put option, the stock must fall below your strike price <em>minus</em> the premium you paid.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateOption() {
+            let type = document.getElementById("optionType").value;
+            let strike = parseFloat(document.getElementById("strike").value);
+            let premium = parseFloat(document.getElementById("premium").value);
+            let contracts = parseInt(document.getElementById("contracts").value);
+            let expiryPrice = parseFloat(document.getElementById("expiryPrice").value);
+
+            if(isNaN(strike) || isNaN(premium) || isNaN(contracts) || isNaN(expiryPrice)) {
+                alert("Please fill in all numerical fields.");
+                return;
+            }
+
+            // 1 standard contract = 100 shares
+            let shares = contracts * 100;
+            let totalCost = premium * shares;
+            
+            let breakEven = 0;
+            let valueAtExpiry = 0;
+
+            if (type === "call") {
+                breakEven = strike + premium;
+                valueAtExpiry = Math.max(0, expiryPrice - strike) * shares;
+            } else if (type === "put") {
+                breakEven = strike - premium;
+                valueAtExpiry = Math.max(0, strike - expiryPrice) * shares;
+            }
+
+            let profit = valueAtExpiry - totalCost;
+
+            // Formatting
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+
+            document.getElementById("resRisk").innerText = formatMoney(totalCost);
+            document.getElementById("resBreakEven").innerText = "$" + breakEven.toFixed(2);
+            
+            let profitElement = document.getElementById("resProfit");
+            profitElement.innerText = (profit >= 0 ? "+" : "") + formatMoney(profit);
+            profitElement.style.color = profit >= 0 ? "#4ade80" : "#f87171"; // Green for win, Red for loss
+
+            document.getElementById("optionResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
