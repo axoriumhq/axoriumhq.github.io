@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Study & Focus Timer | AXORIUM</title>
+    <meta name="description" content="Boost your productivity with our free Pomodoro timer. Track your study sessions, deep work blocks, and breaks.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/pomodoro-timer.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .timer-container {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(198, 167, 94, 0.05);
+            border: 1px solid var(--primary-gold);
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+        .time-display {
+            font-size: 6rem;
+            font-weight: 800;
+            color: var(--primary-gold);
+            line-height: 1;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        @media (max-width: 600px) {
+            .time-display { font-size: 4rem; }
+        }
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .mode-btn {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .mode-btn.active {
+            background: var(--primary-gold);
+            color: #000;
+            border-color: var(--primary-gold);
+        }
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-start {
+            background: #4ade80;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-pause {
+            background: #f87171;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-reset {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .session-tracker {
+            margin-top: 25px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>Pomodoro Focus Timer</h1>
+        <p>Master your time. Work in highly focused blocks and take scheduled breaks to prevent burnout.</p>
+
+        <div class="tool-card" style="max-width: 600px; margin: 0 auto;">
+            
+            <div class="timer-container">
+                <div class="mode-buttons">
+                    <button class="mode-btn active" id="btnWork" onclick="setMode('work')">Deep Work (25m)</button>
+                    <button class="mode-btn" id="btnShort" onclick="setMode('short')">Short Break (5m)</button>
+                    <button class="mode-btn" id="btnLong" onclick="setMode('long')">Long Break (15m)</button>
+                </div>
+
+                <div class="time-display" id="timeDisplay">25:00</div>
+
+                <div class="control-buttons">
+                    <button class="btn-start" id="startBtn" onclick="toggleTimer()">START</button>
+                    <button class="btn-reset" onclick="resetTimer()">RESET</button>
+                </div>
+
+                <div class="session-tracker">
+                    Completed Sessions: <strong style="color: var(--primary-gold);" id="sessionCount">0</strong>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is the Pomodoro Technique?</h2>
+            <p>The <strong>Pomodoro Technique</strong> is a highly effective time management method developed by Francesco Cirillo in the late 1980s. It uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. Each interval is known as a <em>Pomodoro</em>.</p>
+
+            <h2>How to Use This Timer</h2>
+            <p>1. <strong>Pick a single task:</strong> Decide exactly what you are going to study or work on. Do not multitask.<br>
+            2. <strong>Start the 25-minute timer:</strong> Put your phone away, close other tabs, and dedicate yourself to deep work until the timer hits zero.<br>
+            3. <strong>Take a short break (5 minutes):</strong> Step away from the screen, stretch, or grab water.<br>
+            4. <strong>Take a long break (15 minutes):</strong> After completing four consecutive deep work blocks, reward your brain with a longer break to reset.</p>
+
+            <h2>Why It Works</h2>
+            <p>Human attention spans are not designed for marathon 6-hour study sessions. When you try to force focus for too long, your cognitive performance drops off a cliff. By forcing yourself to take structured breaks, you maintain a high level of mental agility and dramatically improve your ability to retain complex information.</p>
+        </div>
+
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        let timer;
+        let isRunning = false;
+        let timeLeft = 25 * 60; // Default 25 minutes in seconds
+        let currentMode = 'work';
+        let sessionsCompleted = 0;
+
+        const timeDisplay = document.getElementById('timeDisplay');
+        const startBtn = document.getElementById('startBtn');
+        const sessionCountDisplay = document.getElementById('sessionCount');
+
+        const modes = {
+            'work': 25 * 60,
+            'short': 5 * 60,
+            'long': 15 * 60
+        };
+
+        function updateDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            timeDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update browser tab title
+            let modeText = currentMode === 'work' ? 'Focus' : 'Break';
+            document.title = `${timeDisplay.innerText} - ${modeText} | AXORIUM`;
+        }
+
+        function setMode(mode) {
+            clearInterval(timer);
+            isRunning = false;
+            currentMode = mode;
+            timeLeft = modes[mode];
+            
+            startBtn.innerText = "START";
+            startBtn.className = "btn-start";
+
+            // Update button styles
+            document.getElementById('btnWork').classList.remove('active');
+            document.getElementById('btnShort').classList.remove('active');
+            document.getElementById('btnLong').classList.remove('active');
+            
+            if(mode === 'work') document.getElementById('btnWork').classList.add('active');
+            if(mode === 'short') document.getElementById('btnShort').classList.add('active');
+            if(mode === 'long') document.getElementById('btnLong').classList.add('active');
+
+            updateDisplay();
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                startBtn.innerText = "RESUME";
+                startBtn.className = "btn-start";
+            } else {
+                isRunning = true;
+                startBtn.innerText = "PAUSE";
+                startBtn.className = "btn-pause";
+                
+                timer = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        isRunning = false;
+                        
+                        // Play a simple alert sound
+                        let audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                        audio.play().catch(e => console.log("Audio play prevented by browser policy"));
+                        
+                        if (currentMode === 'work') {
+                            sessionsCompleted++;
+                            sessionCountDisplay.innerText = sessionsCompleted;
+                            alert("Deep work session complete! Time for a break.");
+                            setMode('short');
+                        } else {
+                            alert("Break is over. Back to work!");
+                            setMode('work');
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            setMode(currentMode);
+        }
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
