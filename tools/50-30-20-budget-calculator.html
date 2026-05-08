@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>50/30/20 Budget Calculator & Planner | AXORIUM</title>
+    <meta name="description" content="Calculate your perfect monthly budget using the famous 50/30/20 rule. Split your income into Needs, Wants, and Savings instantly.">
+    
+    <link rel="canonical" href="https://axoriumhq.github.io/tools/50-30-20-budget-calculator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    
+    <style>
+        .calc-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 25px; }
+        .result-box { background: rgba(198, 167, 94, 0.05); border: 1px solid var(--primary-gold); padding: 25px; margin-top: 25px; border-radius: 12px; display: none; text-align: left; }
+        
+        .budget-category { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-light); }
+        .budget-category:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .cat-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+        .cat-amount { font-size: 1.5rem; font-weight: 800; }
+        .cat-desc { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.4; }
+        
+        .amount-needs { color: #f87171; } /* Red for mandatory */
+        .amount-wants { color: #60a5fa; } /* Blue for fun */
+        .amount-savings { color: #4ade80; } /* Green for wealth */
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AXORIUM</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../tools.html">Tools</a></li>
+        </ul>
+    </nav>
+
+    <section class="tools-section">
+        <h1>50/30/20 Budget Calculator</h1>
+        <p>Instantly split your paycheck into a stress-free financial plan.</p>
+
+        <div class="tool-card" style="max-width: 600px; margin: 0 auto;">
+            <div class="calc-grid">
+                <div>
+                    <label style="display:block; text-align:left; margin-bottom:5px; font-weight:600;">Monthly After-Tax Income ($)</label>
+                    <input type="number" id="monthlyIncome" class="tool-input" placeholder="e.g., 4000" min="1">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-top: 5px;">*Use your net income (what actually hits your bank account), not your gross salary.</p>
+                </div>
+            </div>
+
+            <button onclick="calculateBudget()" style="width: 100%;">Create My Budget</button>
+
+            <div id="budgetResult" class="result-box">
+                <h3 style="color: var(--primary-gold); margin-top: 0; margin-bottom: 20px;">Your Monthly Allocation</h3>
+                
+                <div class="budget-category">
+                    <div class="cat-header">
+                        <span class="cat-title">50% Needs</span>
+                        <span class="cat-amount amount-needs" id="resNeeds">0</span>
+                    </div>
+                    <div class="cat-desc">Housing, groceries, basic utilities, transportation, minimum debt payments, and health insurance.</div>
+                </div>
+
+                <div class="budget-category">
+                    <div class="cat-header">
+                        <span class="cat-title">30% Wants</span>
+                        <span class="cat-amount amount-wants" id="resWants">0</span>
+                    </div>
+                    <div class="cat-desc">Dining out, entertainment, hobbies, travel, shopping, and subscriptions (Netflix, Spotify).</div>
+                </div>
+
+                <div class="budget-category">
+                    <div class="cat-header">
+                        <span class="cat-title">20% Savings & Investing</span>
+                        <span class="cat-amount amount-savings" id="resSavings">0</span>
+                    </div>
+                    <div class="cat-desc">Emergency fund, retirement accounts (401k/IRA), stock market investing, and extra debt payoff.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tool-explanation">
+            <h2>What is the 50/30/20 Rule?</h2>
+            <p>The <strong>50/30/20 rule</strong> is a simple, highly effective budgeting method popularized by Senator Elizabeth Warren in her book <em>All Your Worth: The Ultimate Lifetime Money Plan</em>. The rule divides your after-tax income into three distinct buckets, ensuring you cover your bills, enjoy your life, and build wealth simultaneously.</p>
+
+            <h2>Why It Works Better Than Strict Budgeting</h2>
+            <p>Most traditional budgets fail because they are too restrictive. If you try to track every single penny you spend on coffee, you will eventually experience "budget fatigue" and quit. The 50/30/20 rule gives you a clear boundary for your mandatory bills, a strict target for wealth building, and a guilt-free allowance for everything else.</p>
+
+            <h2>Adjusting for High Cost of Living</h2>
+            <p>If you live in a very expensive city (like New York or London), your rent alone might consume 40% of your income, breaking the "50% Needs" rule. In these cases, you must temporarily pull money from your "30% Wants" bucket to cover your living expenses until you can increase your income.</p>
+        </div>
+    </section>
+
+    <footer>© 2026 AXORIUM. Built for the Relentless.</footer>
+
+    <script>
+        function calculateBudget() {
+            let income = parseFloat(document.getElementById("monthlyIncome").value);
+
+            if(isNaN(income) || income <= 0) {
+                alert("Please enter a valid monthly income.");
+                return;
+            }
+
+            let needs = income * 0.50;
+            let wants = income * 0.30;
+            let savings = income * 0.20;
+
+            const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+
+            document.getElementById("resNeeds").innerText = formatMoney(needs);
+            document.getElementById("resWants").innerText = formatMoney(wants);
+            document.getElementById("resSavings").innerText = formatMoney(savings);
+
+            document.getElementById("budgetResult").style.display = "block";
+        }
+    </script>
+</body>
+</html>
